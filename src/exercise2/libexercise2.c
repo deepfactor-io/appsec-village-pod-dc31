@@ -1,5 +1,4 @@
 /*
- *
  * libexercise2.c
  *
  * LD_PRELOAD library implementation for security tool evasion workshop
