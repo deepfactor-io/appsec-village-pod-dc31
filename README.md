@@ -44,7 +44,7 @@ Specifically, this POD is broken into several submodules:
 This POD will be focused on behavior monitoring of a variety of simple
 applications. The behaviors monitored will be at the syscall and library
 level (for example, reading and writing files, making network connections, etc)
-and thus will not cover "higher level" behaviors such as:
+and thus will not cover other behaviors such as:
 
   - XSS/SQLi/SSRF (behaviors that you might find in a web application)
   - Kernel exploits
