@@ -33,7 +33,7 @@ Specifically, this POD is broken into several submodules:
 
   - Understanding core concepts central to behavior monitoring (API
     interception via hooking, external monitoring, etc)
-  - Understanding the technical capapbilities of various types of behavior
+  - Understanding the technical capabilities of various types of behavior
     monitoring tools on Linux
   - Understanding how to use the POD personal workspace VM image that
     contains the POD hands-on exercises
