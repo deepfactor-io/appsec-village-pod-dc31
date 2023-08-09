@@ -93,7 +93,7 @@ answer this question:
   - A tool can require monitoring behavior for a period of time to arrive
     at a set of expected behaviors (watching what the application does for
     some period of time, cataloging a list of all the behaviors seen (files
-    acessed, network connections made, processes launched, etc)
+    accessed, network connections made, processes launched, etc)
   - A tool might instead depend on a set of precreated rules that cover a
     large subset of common "bad behaviors" (for example, using weak or
     deprecated APIs, accessing sensitive files, making network connections
@@ -111,7 +111,7 @@ access a file later whose name (which is random) was not seen?
 
 The second approach benefits from not requiring monitoring of the application
 to create the ruleset, but has the drawback that the rules generally need to
-be refreshed or updated to reflect new vulnerabiltiies or attack approaches
+be refreshed or updated to reflect new vulnerabilties or attack approaches
 carried out by adversaries. Some tool vendors update their rules frequently,
 others not as much.
 
@@ -167,7 +167,7 @@ by a variety of means:
 
   - Using an eBPF program (Extended Berkeley Packet Filter) in the kernel
     to receive notification when a monitored process invokes a syscall
-    the tool is intereseted in
+    the tool is interested in
   - Using external monitoring (ptrace, ktrace, strace, etc)
 
 Monitoring library calls can be accomplished by injecting code into a process
@@ -239,7 +239,7 @@ The exercises are:
 
 In this example, you will learn how eBPF system call monitoring tools work, and
 a few things you can try to perform certain actions without being noticed
-by the tool. For this example, we will use a contrivied eBPF tool, one that
+by the tool. For this example, we will use a contrived eBPF tool, one that
 is configurable to monitor certain system calls.
 
 ### What is eBPF and how does it work?
@@ -417,7 +417,7 @@ In this lesson, you learned:
 ## Evading library API monitoring
 
 In this next example, you will learn how LD\_PRELOAD interception techniques
-work, and a few things you can try to perform certain actions wihtout being
+work, and a few things you can try to perform certain actions without being
 noticed by this form of monitoring. For this example, we will use a contrived
 LD\_PRELOAD library containing a few intercepts.
 
@@ -512,7 +512,7 @@ behaviors the monitoring library was able to see.
 
 ![Exercise 2a output](images/exercise2a.png)
 
-If you have control of an aapplication's execution environment, you can hide
+If you have control of an application's execution environment, you can hide
 from monitoring by:
 
   - Trying to disable LD\_PRELOAD altogether
