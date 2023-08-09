@@ -384,7 +384,7 @@ noticed by this form of monitoring. For this example, we will use a contrived
 LD\_PRELOAD library containing a few intercepts.
 
 In order to understand what LD\_PRELOAD is, and what behaviors it can monitor,
-we should take a few minutes and talk a bit about how executables are build and
+we should take a few minutes and talk a bit about how executables are built and
 subsequently loaded by the kernel.
 
 When an application is linked, the linker will make a list of any external
@@ -407,7 +407,7 @@ call is routed to the implementation found in the library.
 LD\_PRELOAD is an environment variable that influences the behavior of the
 loader. Specifically, it instructs the loader to prefer symbols contained in
 libraries that it points to _first_, allowing those libraries' implementations
-f things like _open_ to take precedence over those found in other (typically
+of things like _open_ to take precedence over those found in other (typically
 system) libraries. For example, if LD\_PRELOAD was set to "foo.so", and foo.so
 contained an _open_ symbol, then any calls to that function would go to foo.so
 and not to libc (which is typically where you will find that function).
@@ -621,6 +621,8 @@ the application actually uses. This means you don't need to worry about
 hundreds of CVEs that you may see displayed in your SCA/SBOM tool's output.
 If this sounds like something you'd be interested in, we invite you to
 visit us at [https://www.deepfactor.io](https://www.deepfactor.io) for more
-information.
+information. If you'd like to learn more about API interception, check out
+[this whitepaper](https://www.deepfactor.io/observing-application-behavior-via-api-interception/).
+
 
 Happy hacking!
