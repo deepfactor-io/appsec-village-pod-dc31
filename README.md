@@ -83,7 +83,7 @@ examining what an application does, at runtime, a tool can tell the security
 team or application developer if the application is exhibiting abnormal
 or risky behavior. This monitoring is typically done at some API level; it
 could be that the tool is monitoring library calls, or the tool might be
-monitoring system calls issued by the appliation to the kernel.
+monitoring system calls issued by the application to the kernel.
 
 Regardless of which API level is chosen, how does a monitoring tool even know
 what "abnormal" or  "unexpected" behavior is? What library or system calls
