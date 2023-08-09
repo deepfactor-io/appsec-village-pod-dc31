@@ -1,0 +1,24 @@
+#include <linux/socket.h>
+#include <sys/socket.h>
+
+tracepoint:syscalls:sys_enter_open {
+	printf("%s (pid %d): open(%s)\n", comm, pid, str(args->filename));
+}
+
+tracepoint:syscalls:sys_enter_openat {
+	printf("%s (pid %d): openat(%s)\n", comm, pid, str(args->filename));
+}
+
+kprobe:tcp_connect
+{
+	$sk = ((struct sock *) arg0);
+	$inet_family = $sk->__sk_common.skc_family;
+
+	if ($inet_family == AF_INET) {
+		$daddr = ntop($sk->__sk_common.skc_daddr);
+		$dport = $sk->__sk_common.skc_dport;
+		$dport = bswap($dport);
+
+		printf("%s (pid %d): connect(%s:%d)\n", comm, pid, daddr, dport);
+	  }
+}

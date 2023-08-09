@@ -12,7 +12,7 @@ learn the following:
   - As an AppSec professional, how you can configure your monitoring tools
     to ensure application behavior can always be detected.
 
-This POD is sized for approximately 2 hours of hands-on time, following
+This POD is sized for approximately 1 hour of hands-on time, following
 the tutorial described in this document and is intended for the following
 audience:
 
@@ -24,9 +24,9 @@ audience:
 
 Like many security topics, application security, and specifically security
 monitoring tools have a very broad surface area for discussion. Although this
-POD is sized for a 2 hour exercise, it would be easy to make that 20 hours or
-even 200 hours. This POD is intended to cover the basic subject matter;
-hopefully you will find the exercises interesting and choose to later emabark
+POD is sized for a 1 hour exercise, it would be easy to make that 10 hours or
+even 100 hours. This POD is intended to cover the basic subject matter;
+hopefully you will find the exercises interesting and choose to later embark
 upon a self-guided mission to learn more.
 
 Specifically, this POD is broken into several submodules:
@@ -35,7 +35,7 @@ Specifically, this POD is broken into several submodules:
     interception via hooking, external monitoring, etc)
   - Understanding the technical capapbilities of various types of behavior
     monitoring tools on Linux
-  - Understanding how to use the POD "personal workspace" VM image that
+  - Understanding how to use the POD personal workspace VM image that
     contains the POD hands-on exercises
   - Other ideas, and conclusions
 
@@ -46,11 +46,11 @@ applications. The behaviors monitored will be at the syscall and library
 level (for example, reading and writing files, making network connections, etc)
 and thus will not cover "higher level" behaviors such as:
 
-  - XSS/SQLi/SSRF ("Behaviors" that you might find in a web application)
+  - XSS/SQLi/SSRF (behaviors that you might find in a web application)
   - Kernel exploits
   - Behavior monitoring and evasion on Windows or other non-Linux platforms
-  - This is intended to be a beginner/intermediate pod, so anything too crazy
-    or advanced won't be covered
+  - This is intended to be a beginner level pod, so anything too crazy or
+    advanced won't be covered
 
 ### Intended Audience
 
@@ -175,7 +175,8 @@ and hooking functions, or by using LD\_PRELOAD to override symbol resolution
 when the application is launched.
 
 In this POD, we will focus on eBPF and LD\_PRELOAD based tools, and we'll
-explain how each works in detail in the exercise subsections later.
+explain how each works in detail in the exercise subsections later. Don't
+worry if you don't know what those terms mean yet.
 
 ## Using the personal workspace VM and exercise code
 
@@ -198,9 +199,7 @@ Once you have downloaded the virtual machine image, create a virtual machine
 using your host hypervisor software (directions on how to do this vary and are
 outside the scope of this document).
 
-_Note_: The virtual machine does not require any network connectivity
-for the first two exercises, but requires outbound connectivity on port 53 (DNS)
-for the final exercise.
+_Note_: The virtual machine does not require any network connectivity.
 
 After creating and starting the virtual machine, the login information you will
 need is as follows:
@@ -214,14 +213,13 @@ changes you wish.
 
 ## The exercises
 
-This POD is broken down into three exercises, all of which can be done within
+This POD is broken down into two exercises, both of which can be done within
 the personal workspace VM created above.
 
 The exercises are:
 
   - *Evading syscall monitoring tools*
   - *Evading library API monitoring tools*
-  - *Using confused deputies*
 
 ## Evading syscall monitoring
 
@@ -269,6 +267,10 @@ tools generally have groups of behaviors that can be enabled or disabled,
 directing the tool to intercept groups of system calls that relate to the
 selected behaviors.
 
+When selecting which system call to use to evade monitoring, what can you
+rely on? One thing that is sometimes useful is to use new system calls; we'll
+show an example using this technique in exercise 1b below.
+
 ### Exercise: Evading eBPF system call monitoring
 
 This exercise's content lives under the /home/user/exercise1 directory and
@@ -277,7 +279,7 @@ consists of the following:
   - An eBPF program you will load into the kernel that monitors various
     system calls
   - An example application designed to illustrate how the eBPF program works
-    + This program modifies files in /etc, and makes a few outbound network
+    + This program accesses files in /etc, and makes a few outbound network
       connections (things that would typically be of interest to a security
       monitoring tool)
 
@@ -292,11 +294,47 @@ application:
   - /home/user/exercise1/exercise1a
 
 The eBPF monitoring program will log its observations to /tmp/exercise1.log
-and will contain information about the system calls observed.
+and will contain information about the system calls observed. Since we are
+monitoring using eBPF, all system calls from all processes will be logged
+(including those from processes other than exercise1a).
+
+![Exercise 1a output](images/exercise1a.png)
+
+#### Advanced: Looking at the code
+
+If you're interested in how the eBPF monitoring code and example application
+works, read on. Otherwise, you can skip this section.
+
+As shown below, the eBPF monitoring code contained in exercise1.ebpf is
+installed in the kernel using the `bpftrace` tool. This tool is used to load a
+high level version of the eBPF byetcode into the kernel (raw BPF/eBPF language
+is more low level than what you're seeing here). The code is configured to
+monitor three kernel activities:
+
+  - _open_ system calls
+  - _openat_ system calls
+  - _Outbound TCP connections_
+
+![eBPF sample code](images/figure1.png)
+
+On each interception, information about the process performing the operation
+is printed (lines 5, 9, and 22). The bpftrace program will stay in the
+foreground until killed with ^C.
+
+The [exercise1a.c](src/exercise1/exercise1a.c) file contains the sample
+application; it is a contrived example of an application that performs the
+following:
+
+  - Opens /etc/shadow
+  - Performs a DNS resolution of www.google.com
+  - Connects to the address returned from the DNS resolution
+
+It should be apparent how the operations listed above match the monitored
+activities in the previous list.
 
 ### Evading system call monitoring
 
-If we wanted to hide some of the behavior exhibited by example1a, what could
+If we wanted to hide some of the behavior exhibited by exercise1a, what could
 we do? There are several things we can try:
 
   - Avoid the system calls being monitored (eg, try to use a variant not
@@ -328,19 +366,31 @@ seen on every invocation of that syscall.
 In the /home/user/exercise1 directory, you'll find another executable named
 exercise1b. This executable replaces _open_ calls with _openat2_ calls, and
 avoids having its file operations seen by the monitoring tool (this can be
-verified by reviewing the monitoring log after running example1b).
+verified by reviewing the monitoring log after running example1b). You should
+see that the _open_ operation for /etc/shadow is not seen (you can compare
+the two log outputs to verify this, one from exercise1a and the other from
+exercise1b).
 
-Another example of system call evasion is contained in
-/home/user/exercise1/exercise1c. This application uses _io_uring_, a new API
-that can be used to read from and write to file descriptors without using
-any system calls at all. Combining what we saw in exercise1b (replacing _open_
-calls with _openat2_) with _io_uring_, exercise1c modifies files in /etc
-without the eBPF monitoring tool seeing either the open or the write
-operations.
+![Exercise 1b output](images/exercise1b.png)
 
-To run the exercise1c example:
+#### Advanced: Looking at the code
 
-  - Run /home/user/exercise1/exercise1c
+If you examine the exercise1b.c code, you'll see that the call to _open_
+has been replaced by a hand-rolled system call invocation of _openat2_. This
+is our attempt to hide the opening of /etc/shadow by using a system call
+not monitored by the eBPF script.
+
+If you wanted to experiment, you could duplicate the code block in
+exercise1.ebpf and add a block for _openat2_ as follows:
+
+```
+tracepoint:syscalls:sys_enter_openat2 {
+     printf("%s (pid %d): openat2(%s)\n", comm, pid, str(args->filename));
+}
+```
+
+If you then re-run exercise1b, you'll see that the openat2 system call is
+indeed monitored.
 
 ### Lessons learned
 
@@ -445,6 +495,8 @@ can issue the following command to remove the LD\_PRELOAD behavior:
 
 After running the test program, you can examine /tmp/exercise2.log to see what
 behaviors the monitoring library was able to see.
+
+![Exercise 2a output](images/exercise2a.png)
 
 If you have control of an aapplication's execution environment, you can hide
 from monitoring by:
@@ -560,7 +612,9 @@ machines and implements a forwarding and caching local DNS server. Since
 all nameserver lookups will generally flow through this daemon, it is likely
 not something being monitored. Further, even if it was monitored, the
 monitoring tool would only end up seeing a stream of outbound DNS lookups,
-without any of correlating which request came from which process.
+without any of correlating which request came from which process (this
+information would be "hidden" from view since all queries appear to originate
+from systemd-resolvd, not the actual application).
 
 If we created a TCP connection on port 53 to 127.0.0.53 (the aliased loopback
 address used by systemd-resolved), we could issue our DNS (DGA) request in a
@@ -568,33 +622,12 @@ way that would simply look like a connect() call to any tool monitoring us.
 Since we would be bypassing any gethostbyname() family libc calls, we wouldn't
 likely be flagged by LD\_PRELOAD based monitoring, either.
 
-As an example of this scenario, we've set up a dummy C&C server that accepts
-fake DNS based data exfiltration requests, and a sample application in the
-peronal workspace VM that can be used in conjunction with either of the
-two monitoring tools configured there.
+### Some questions to ponder
 
-To run the example:
-
-  - /home/user/exercise3/lookup xxx
-   + Where xxx is data you want to exfiltrate to the dummy C&C server
-
-The exercise3 lookup application will make a connection to systemd-resolved,
-make a hand-crafted DNS resolution request to the C&C server's DNS server,
-using the supplied xxx parameter as the domain query being sent. Since
-systemd-resolved is not running with LD\_PRELOAD set, it won't be subject
-to monitoring by that monitoring tool. Further, the eBPF monitoring tool
-from example 1 is specifically coded to ignore operations from
-systemd-resolved, so operations it performs will go unmonitored as well.
-
-To visit the dummy C&C server, you can point your browser to:
-
-  - XXX
-
-This server will show the last exfiltrated data. For brevity and simplicity,
-the exfiltrated data will be converted to hex and truncated to the first
-four bytes. (Eg, /home/user/exercise3/lookup AAAA would show 0x41414141 on
-the C&C server's output).
-
+  - Why wasn't the DNS resolution operation caught by the eBPF monitor?
+    + Could you add a monitoring stub to the eBPF program to capture
+      _getaddrinfo_ ?
+  - In exercise 2b, why did we not replace getaddrinfo with s\_getaddrinfo?
 
 ## Conclusion
 
