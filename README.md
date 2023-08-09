@@ -211,6 +211,20 @@ The virtual machine image is configured to allow passwordless sudo to the root
 user from the username shown above. Feel free to make any other configuration
 changes you wish.
 
+## Using your own VM/environment
+
+Don't want to download or use the precreated VM? No problem! To build the
+code manually, we've provided two Makefiles (one in src/exercise1 and another
+in src/exercise2). Just clone this repo and run "make" in the examples
+directories. The POD depends on the following packages, which might
+need to be installed in your environment:
+
+  - make
+  - gcc
+  - bpftrace
+
+Once you've built the exercises, the rest of the instructions here are the same.
+
 ## The exercises
 
 This POD is broken down into two exercises, both of which can be done within
