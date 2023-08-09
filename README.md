@@ -35,8 +35,7 @@ Specifically, this POD is broken into several submodules:
     interception via hooking, external monitoring, etc)
   - Understanding the technical capabilities of various types of behavior
     monitoring tools on Linux
-  - Understanding how to use the POD personal workspace VM image that
-    contains the POD hands-on exercises
+  - Understanding how to use the POD repository / code.
   - Other ideas, and conclusions
 
 ### What Is Not Covered
@@ -178,44 +177,10 @@ In this POD, we will focus on eBPF and LD\_PRELOAD based tools, and we'll
 explain how each works in detail in the exercise subsections later. Don't
 worry if you don't know what those terms mean yet.
 
-## Using the personal workspace VM and exercise code
+## Building the POD code
 
-To assist you in working through the exercises in this POD, we have created a
-virtual machine image you can download.
-
-The virtual machine image is delivered in a variety of formats:
-
-  - A .vmdk file for VMware workstation/Fusion host environments
-  - A .qcow2 file for Linux libvirt/libvirtd (qemu) host environments
-  - A .vhdx file for Windows host environments (Hyper-V)
-
-You will only need to download the virtual machine image for the environment
-that matches your host/hypervisor.  Download the appropriate VM image using
-one of the following links:
-
-XXX links here
-
-Once you have downloaded the virtual machine image, create a virtual machine
-using your host hypervisor software (directions on how to do this vary and are
-outside the scope of this document).
-
-_Note_: The virtual machine does not require any network connectivity.
-
-After creating and starting the virtual machine, the login information you will
-need is as follows:
-
-  - Username: user
-  - Password: appsec2023
-
-The virtual machine image is configured to allow passwordless sudo to the root
-user from the username shown above. Feel free to make any other configuration
-changes you wish.
-
-## Using your own VM/environment
-
-Don't want to download or use the precreated VM? No problem! To build the
-code manually, we've provided two Makefiles (one in src/exercise1 and another
-in src/exercise2). Just clone this repo and run "make" in the examples
+To build the POD code, we've provided two Makefiles (one in src/exercise1 and
+another in src/exercise2). Just clone this repo and run "make" in the examples
 directories. The POD depends on the following packages, which might
 need to be installed in your environment:
 
@@ -227,10 +192,7 @@ Once you've built the exercises, the rest of the instructions here are the same.
 
 ## The exercises
 
-This POD is broken down into two exercises, both of which can be done within
-the personal workspace VM created above.
-
-The exercises are:
+This POD is broken down into two exercises. The exercises are:
 
   - *Evading syscall monitoring tools*
   - *Evading library API monitoring tools*
@@ -495,7 +457,8 @@ monitoring tool might do:
 The exercise2.so library is configured to log these behaviors to
 /tmp/exercise2.log.
 
-To run this exercise, issue the following commands in the personal workspace VM:
+To run this exercise, issue the following commands (assuming /home/user is
+where you installed the code):
 
   * export LD\_PRELOAD=/home/user/exercise2/libexercise2.so
   * /home/user/exercise2/exercise2a
