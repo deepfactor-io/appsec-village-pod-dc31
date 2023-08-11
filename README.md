@@ -605,6 +605,8 @@ likely be flagged by LD\_PRELOAD based monitoring, either.
     + Could you add a monitoring stub to the eBPF program to capture
       _getaddrinfo_ ?
   - In exercise 2b, why did we not replace getaddrinfo with s\_getaddrinfo?
+  - Look at LD\_AUDIT, another environment variable affecting the operation
+    of the loader. Could LD\_AUDIT be used to circumvent LD\_PRELOAD?
 
 ## Conclusion
 
