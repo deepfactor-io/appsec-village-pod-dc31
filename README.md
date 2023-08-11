@@ -192,10 +192,11 @@ Once you've built the exercises, the rest of the instructions here are the same.
 
 ## The exercises
 
-This POD is broken down into two exercises. The exercises are:
+This POD is broken down into three exercises. The exercises are:
 
   - *Evading syscall monitoring tools*
   - *Evading library API monitoring tools*
+  - *Evasion by syscall avoidance*
 
 ## Evading syscall monitoring
 
@@ -544,6 +545,59 @@ In this lesson, you learned:
     using LD\_PRELOAD
   - An example of an LD\_PRELOAD based monitoring library
   - Ideas to avoid being seen by monitoring tools using this type of technology
+
+## Avoiding read detection via io\_uring
+
+io\_uring is a new Linux subsystem designed to provide fast I/O by not
+having to suffer from the system call overhead associated with repeated
+I/O system calls (read, write, etc). It accomplishes this by using a zero-copy
+approach wherein the kernel deposits read results (or fetches write requests)
+from a shared ring buffer in userspace.
+
+Another, simpler way to describe this is as follows:
+
+  - The user process opens a file for reading.
+  - Instead of issuing system calls like read(), pread(), etc, the process
+    instead sets up a list of buffers into which it tells the kernel
+    "please read the file into these buffers, and signal me when some buffers
+    are ready for processing". This is not unlike pread()/preadv2()
+  - The user mode process acts on the content of the buffers and advance
+    a _ring pointer_, telling the kernel that "n buffers have been consumed,
+    please process the next n buffers".
+  - This process continues until the I/O operation is complete.
+
+The difference between pread/preadv2 and io\_uring is that in the io\_uring
+case, the process does not need to make multiple system calls to process the
+next buffers in the ring. Instead, a head/tail index mechanism is used; the
+only "overhead" associated with requesting the next n buffers is updating
+a single value in memory. This avoids all the system call overhead (context
+switches, spectre/meltdown overhead, etc) and greatly improves I/O performance.
+
+In this repository, there is an exercise3 application that utilizes io\_uring
+to perform file reads without actually calling any read()-family system calls.
+
+To run exercise3:
+
+  - As root, run /home/user/exercise3/monitor
+
+Next, in another window, issue the following command to show that the monitor
+tool captures reads:
+
+  - cat /etc/passwd      (or any other file of your choice)
+
+Next, in another window, issue the following command to run the example/test
+application:
+
+  - /home/user/exercise3/exercise3 /etc/passwd     (or any other file of your
+    choice)
+
+Because exercise3 uses io\_uring to perform the read operation, you should
+not see any read output from the monitoring tool for the file you requested.
+There is one single read() captured (this is the loader reading shared libraries
+
+into memory and not the file you actually accessed in the example, though).
+Also note that the initial open of the file is still captured by the monitor,
+so it's not a perfect evasion.
 
 ## Miscellaneous topics
 

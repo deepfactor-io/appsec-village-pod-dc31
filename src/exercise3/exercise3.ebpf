@@ -1,0 +1,11 @@
+tracepoint:syscalls:sys_enter_open {
+	printf("%s (pid %d): open(%s)\n", comm, pid, str(args->filename));
+}
+
+tracepoint:syscalls:sys_enter_openat {
+	printf("%s (pid %d): openat(%s)\n", comm, pid, str(args->filename));
+}
+
+tracepoint:syscalls:sys_enter_read {
+	printf("%s (pid %d): read requested\n", comm, pid);
+}

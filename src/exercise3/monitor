@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+bpftrace exercise3.ebpf | tee /tmp/exercise3.log
