@@ -17,7 +17,7 @@ kprobe:tcp_connect
 	if ($inet_family == AF_INET) {
 		$daddr = ntop($sk->__sk_common.skc_daddr);
 		$dport = $sk->__sk_common.skc_dport;
-		$dport = (($dport & 0xFF) << 8) & (($dport & 0xFF00) >> 8);
+		$dport = (($dport & 0xFF) << 8) | (($dport & 0xFF00) >> 8);
 
 		printf("%s (pid %d): connect(%s:%d)\n", comm, pid, $daddr, $dport);
 	  }
